@@ -37,15 +37,17 @@ class ViewerGL:
         self.touch = {}
 
     def run(self):
-        global t_espace, t_right, t_left, t_pos, score, cpt
+        global t_espace, t_right, t_left, t_pos, score, cpt, temps
         #initialisation de la variable t_espace pour le saut
         t_espace = 0
         t_right  = 0
         t_left   = 0
         t_pos    = 0
         score    = glfw.get_time()
+        cpt      = 0
         # boucle d'affichage
         while not glfw.window_should_close(self.window):
+            cpt += 1
             # nettoyage de la fenêtre : fond et profondeur
             GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
 
@@ -64,6 +66,7 @@ class ViewerGL:
             self.cam.transformation.translation = self.objs[0].transformation.translation + pyrr.Vector3([0, 1, 5])
             
             #On fait avancer notre personnage en continue
+            vit = 0.2 + cpt * 0.05
             self.objs[0].transformation.translation += \
                 pyrr.matrix33.apply_to_vector(pyrr.matrix33.create_from_eulers(self.objs[0].transformation.rotation_euler), pyrr.Vector3([0, 0, 0.02]))
 
@@ -87,7 +90,7 @@ class ViewerGL:
                 #dt = time.time() - start
                 self.objs[0].vitesse                    -= g * 0.05
                 self.objs[0].transformation.translation += self.objs[0].vitesse * 0.05
-            #pour empêcher que notre personnage s'enfonce dans le sol :
+            #pour empêcher que notre personnage s'enfonce dans le sol à la fin du saut:
             if self.objs[0].transformation.translation.y < 1 :
                 self.objs[0].transformation.translation.y = 1
 
@@ -123,7 +126,6 @@ class ViewerGL:
             glfw.swap_buffers(self.window)
             # gestion des évènements
             glfw.poll_events()
-            
         
     def key_callback(self, win, key, scancode, action, mods):
         global t_espace, t_right, t_left, t_pos
@@ -133,8 +135,9 @@ class ViewerGL:
         self.touch[key] = action
         #if t_espace == 0 : #cette condition permet de pas superposer deux sauts
         if key == glfw.KEY_SPACE and action == glfw.PRESS:
-            self.objs[0].vitesse.y = 10
-            self.objs[0].transformation.translation.y = 1.01
+            if self.objs[0].transformation.translation.y == 1 :
+                self.objs[0].vitesse.y = 10
+                self.objs[0].transformation.translation.y = 1.01
 
         if t_left == 0 and t_right == 0 and t_pos >-1 :
         #le t_left == 0 et t_right == 0 sont les conditions qui font que on ne peut pas faire deux déplacements simultanés
