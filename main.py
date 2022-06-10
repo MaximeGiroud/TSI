@@ -1,7 +1,7 @@
 from viewerGL import ViewerGL
 import glutils
 from mesh import Mesh
-from cpe3d import Object3D, Camera, Transformation3D, Text, ObjectPhyx
+from cpe3d import Object3D, Camera, Object3D_Sphere, ObjectPhyx_Sphere, Transformation3D, Text, ObjectPhyx
 import numpy as np
 import OpenGL.GL as GL
 import pyrr
@@ -16,6 +16,8 @@ def main():
     program3d_id  = glutils.create_program_from_file('shader.vert', 'shader.frag')
     programGUI_id = glutils.create_program_from_file('gui.vert', 'gui.frag')
 
+
+    """#Stegosaurus
     m                    = Mesh.load_obj('stegosaurus.obj')
     m.normalize()
     m.apply_matrix(pyrr.matrix44.create_from_scale([2, 2, 2, 1]))
@@ -26,18 +28,10 @@ def main():
     texture              = glutils.load_texture('stegosaurus.jpg')
     vitesse              = pyrr.Vector3()
     o                    = ObjectPhyx(m.load_to_gpu(), m.get_nb_triangles(), program3d_id, texture, tr, vitesse)
-    viewer.add_object(o)
+    viewer.add_object(o)"""
 
-    #m = Mesh()
-    #p0, p1, p2, p3 = [-25, 0, -25], [25, 0, -25], [25, 0, 25], [-25, 0, 25]
-    #n, c           = [0, 1, 0], [1, 1, 1]
-    #t0, t1, t2, t3 = [0, 0], [1, 0], [1, 1], [0, 1]
-    #m.vertices     = np.array([[p0 + n + c + t0], [p1 + n + c + t1], [p2 + n + c + t2], [p3 + n + c + t3]], np.float32)
-    #m.faces        = np.array([[0, 1, 2], [0, 2, 3]], np.uint32)
-    #texture        = glutils.load_texture('grass.jpg')
-    #o              = Object3D(m.load_to_gpu(), m.get_nb_triangles(), program3d_id, texture, Transformation3D())
-    #viewer.add_object(o)
 
+    #Sphère
     nb_points = 50
     m = Mesh()
     u = np.linspace(0, 2 * np.pi, nb_points)
@@ -70,7 +64,28 @@ def main():
             t.append(tc1)
     m.faces = np.array(t, np.uint32)
     print(m.faces)
+    #Définitions nécessaires pour l'utilisation de Object3D_Spehre
+    #On a recréer une autre fonction Object3D car on a pas de texture pour notre Sphère (on l'a faite nous même)
+    tr                   = Transformation3D()
+    tr.translation.y     = -np.amin(m.vertices, axis=0)[1]
+    tr.translation.z     = -5
+    tr.rotation_center.z = 0.2
+    vitesse              = pyrr.Vector3()
+    o                    = ObjectPhyx_Sphere(m.load_to_gpu(), m.get_nb_triangles(), program3d_id, tr, vitesse)
+    viewer.add_object(o)
     
+
+    #Sol (herbe)
+    m = Mesh()
+    p0, p1, p2, p3 = [-25, 0, -25], [25, 0, -25], [25, 0, 25], [-25, 0, 25]
+    n, c           = [0, 1, 0], [1, 1, 1]
+    t0, t1, t2, t3 = [0, 0], [1, 0], [1, 1], [0, 1]
+    m.vertices     = np.array([[p0 + n + c + t0], [p1 + n + c + t1], [p2 + n + c + t2], [p3 + n + c + t3]], np.float32)
+    m.faces        = np.array([[0, 1, 2], [0, 2, 3]], np.uint32)
+    texture        = glutils.load_texture('grass.jpg')
+    o              = Object3D(m.load_to_gpu(), m.get_nb_triangles(), program3d_id, texture, Transformation3D())
+    viewer.add_object(o)
+
 
 
     # m.vertices     = np.array([[p0 + n + c + t0], [p1 + n + c + t1], [p2 + n + c + t2], [p3 + n + c + t3]], np.float32)
@@ -79,7 +94,7 @@ def main():
     o              = Object3D(m.load_to_gpu(), m.get_nb_triangles(), program3d_id, texture, Transformation3D())
     viewer.add_object(o)
 
-    m                    = Mesh.load_obj('cube.obj')
+    """m                    = Mesh.load_obj('cube.obj')
     m.normalize()
     m.apply_matrix(pyrr.matrix44.create_from_scale([2, 2, 2, 1]))
     tr                   = Transformation3D()
@@ -87,9 +102,8 @@ def main():
     tr.translation.z     = -5
     tr.rotation_center.z = 0.2
     texture              = glutils.load_texture('color_cube.jpg')
-    vitesse              = pyrr.Vector3()
     o                    = Object3D(m.load_to_gpu(), m.get_nb_triangles(), program3d_id, texture, tr)
-    viewer.add_object(o)
+    viewer.add_object(o)"""
 
 
 #    vao     = Text.initalize_geometry()

@@ -23,6 +23,53 @@ class Object:
             GL.glBindTexture(GL.GL_TEXTURE_2D, self.texture)
             GL.glDrawElements(GL.GL_TRIANGLES, 3*self.nb_triangle, GL.GL_UNSIGNED_INT, None)
 
+class Object_Sphere:
+    def __init__(self, vao, nb_triangle, program):
+        self.vao = vao
+        self.nb_triangle = nb_triangle
+        self.program = program
+        self.visible = True
+
+    def draw(self):
+        if self.visible : 
+            GL.glUseProgram(self.program)
+            GL.glBindVertexArray(self.vao)
+            GL.glDrawElements(GL.GL_TRIANGLES, 3*self.nb_triangle, GL.GL_UNSIGNED_INT, None)
+
+class Object3D_Sphere(Object_Sphere):
+    def __init__(self, vao, nb_triangle, program, transformation):
+        super().__init__(vao, nb_triangle, program)
+        self.transformation = transformation
+
+    def draw(self):
+        GL.glUseProgram(self.program)
+
+        # Récupère l'identifiant de la variable pour le programme courant
+        loc = GL.glGetUniformLocation(self.program, "translation_model")
+        # Vérifie que la variable existe
+        if (loc == -1) :
+            print("Pas de variable uniforme : translation_model")
+        # Modifie la variable pour le programme courant
+        translation = self.transformation.translation
+        GL.glUniform4f(loc, translation.x, translation.y, translation.z, 0)
+
+        # Récupère l'identifiant de la variable pour le programme courant
+        loc = GL.glGetUniformLocation(self.program, "rotation_center_model")
+        # Vérifie que la variable existe
+        if (loc == -1) :
+            print("Pas de variable uniforme : rotation_center_model")
+        # Modifie la variable pour le programme courant
+        rotation_center = self.transformation.rotation_center
+        GL.glUniform4f(loc, rotation_center.x, rotation_center.y, rotation_center.z, 0)
+
+        rot = pyrr.matrix44.create_from_eulers(self.transformation.rotation_euler)
+        loc = GL.glGetUniformLocation(self.program, "rotation_model")
+        if (loc == -1) :
+            print("Pas de variable uniforme : rotation_model")
+        GL.glUniformMatrix4fv(loc, 1, GL.GL_FALSE, rot)
+
+        super().draw()
+
 class Object3D(Object):
     def __init__(self, vao, nb_triangle, program, texture, transformation):
         super().__init__(vao, nb_triangle, program, texture)
@@ -60,6 +107,11 @@ class Object3D(Object):
 class ObjectPhyx(Object3D):
     def __init__(self, vao, nb_triangle, program, texture, transformation, vitesse):
         super().__init__(vao, nb_triangle, program, texture, transformation)
+        self.vitesse = vitesse
+
+class ObjectPhyx_Sphere(Object3D_Sphere):
+    def __init__(self, vao, nb_triangle, program, transformation, vitesse):
+        super().__init__(vao, nb_triangle, program, transformation)
         self.vitesse = vitesse
 
 class Camera:

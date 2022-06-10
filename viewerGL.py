@@ -37,12 +37,13 @@ class ViewerGL:
         self.touch = {}
 
     def run(self):
-        global t_espace, t_right, t_left, t_pos, dt
+        global t_espace, t_right, t_left, t_pos, score, cpt
         #initialisation de la variable t_espace pour le saut
         t_espace = 0
         t_right  = 0
         t_left   = 0
         t_pos    = 0
+        score    = glfw.get_time()
         # boucle d'affichage
         while not glfw.window_should_close(self.window):
             # nettoyage de la fenêtre : fond et profondeur
@@ -103,22 +104,20 @@ class ViewerGL:
             else :
                 t_left = 0      
 
-            #Collisions
+            """#Collisions
             #On récupère la hitbox de chaque objet
             hitbox_cube  = self.objs[2].transformation.transition
             #hitbox_cube2  = self.objs[3].transformation.transition
             hitbox_spere = self.objs[0].transformation.transition
             #On gère les collisions (affichage game over + score)
-            if norm(hitbox_spere-hitbox_cube)   < 2 :
-                score=glfw.get_time()
+            if norm(hitbox_spere - hitbox_cube)   < 2 :
                 print("Vous avez perdu !")
                 print("Votre score est de : ", score)
                 glfw.set_window_should_close(self.window, glfw.TRUE)
             #elif norm(hitbox_spere-hitbox_cube2) < 2:
-            #    score=glfw.get_time()
             #    print("Vous avez perdu !")
             #    print("Votre score est de : ", score)
-            #    glfw.set_window_should_close(self.window, glfw.TRUE)
+            #    glfw.set_window_should_close(self.window, glfw.TRUE)"""
 
             # changement de buffer d'affichage pour éviter un effet de scintillement
             glfw.swap_buffers(self.window)
