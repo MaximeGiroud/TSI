@@ -37,14 +37,16 @@ class ViewerGL:
         self.touch = {}
 
     def run(self):
-        global t_espace, t_right, t_left, t_pos, score, cpt, temps
+        global t_espace, t_right, t_left, t_pos, score, cpt
         #initialisation de la variable t_espace pour le saut
         t_espace = 0
         t_right  = 0
         t_left   = 0
         t_pos    = 0
-        score    = glfw.get_time()
+        score    = 0
         cpt      = 0
+        self.objs[3].transformation.translation.z = 10
+        self.objs[4].transformation.translation.z = 20
         # boucle d'affichage
         while not glfw.window_should_close(self.window):
             cpt += 1
@@ -66,14 +68,39 @@ class ViewerGL:
             self.cam.transformation.translation = self.objs[0].transformation.translation + pyrr.Vector3([0, 1, 5])
             
             #On fait avancer notre personnage en continue
-            vit = 0.2 + cpt * 0.05
             self.objs[0].transformation.translation += \
-                pyrr.matrix33.apply_to_vector(pyrr.matrix33.create_from_eulers(self.objs[0].transformation.rotation_euler), pyrr.Vector3([0, 0, 0.02]))
+                pyrr.matrix33.apply_to_vector(pyrr.matrix33.create_from_eulers(self.objs[0].transformation.rotation_euler), pyrr.Vector3([0, 0, 0.03]))
 
+                        #Collisions
+            #On récupère la hitbox de chaque objet
+            hitbox_cube_jaune   = self.objs[3].transformation.translation
+            hitbox_cube_orange  = self.objs[4].transformation.translation
+            hitbox_spere        = self.objs[0].transformation.translation
+            #On gère les collisions (affichage game over + score)
+            if norm(hitbox_spere - hitbox_cube_jaune)  < 2 and cpt > 15 : #cpt permet d'initialiser le jeu (de pas perdre à 0 secondes)
+                score = score*10
+                score = int(score)
+                print("Vous avez perdu !")
+                print("Votre score est de : ", score)
+                glfw.set_window_should_close(self.window, glfw.TRUE)
+            elif norm(hitbox_spere-hitbox_cube_orange) < 2 and cpt > 15 :
+               score = score*10
+               score = int(score)
+               print("Vous avez perdu !")
+               print("Votre score est de : ", score)
+               glfw.set_window_should_close(self.window, glfw.TRUE)
+
+            #Déplacement des obstacles : on les déplace devant si ils sont trop loin derrière
+            if self.objs[3].transformation.translation.z < self.objs[0].transformation.translation.z :
+                self.objs[3].transformation.translation.z += 20
+                score += 1
+            if self.objs[4].transformation.translation.z < self.objs[0].transformation.translation.z :
+                self.objs[4].transformation.translation.z += 20
+                score += 1
             
             #Pour les déplacements (il faut mettre le code ici sinon ça ne boucle pas)
-            
-            #Le saut (méthode sans gravité)
+
+            #Le saut (méthode sans gravité) (on ne garde pas cette méthode)
             #if t_espace > 50 :
             #    self.objs[0].transformation.translation.y += 0.01
             #    t_espace = t_espace -1
@@ -107,20 +134,6 @@ class ViewerGL:
             else :
                 t_left = 0      
 
-            """#Collisions
-            #On récupère la hitbox de chaque objet
-            hitbox_cube  = self.objs[2].transformation.transition
-            #hitbox_cube2  = self.objs[3].transformation.transition
-            hitbox_spere = self.objs[0].transformation.transition
-            #On gère les collisions (affichage game over + score)
-            if norm(hitbox_spere - hitbox_cube)   < 2 :
-                print("Vous avez perdu !")
-                print("Votre score est de : ", score)
-                glfw.set_window_should_close(self.window, glfw.TRUE)
-            #elif norm(hitbox_spere-hitbox_cube2) < 2:
-            #    print("Vous avez perdu !")
-            #    print("Votre score est de : ", score)
-            #    glfw.set_window_should_close(self.window, glfw.TRUE)"""
 
             # changement de buffer d'affichage pour éviter un effet de scintillement
             glfw.swap_buffers(self.window)

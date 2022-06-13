@@ -36,7 +36,7 @@ def main():
     viewer.add_object(o)"""
 
 
-    #Sphère
+    #Notre personnage : une sphère
     nb_points = 50
     m = Mesh()
     u = np.linspace(-np.pi, np.pi, nb_points)
@@ -69,19 +69,18 @@ def main():
             t.append(tc1)
     m.faces = np.array(t, np.uint32)
     print(m.faces)
-    #Définitions nécessaires pour l'utilisation de Object3D_Spehre
-    #On a recréer une autre fonction Object3D car on a pas de texture pour notre Sphère (on l'a faite nous même)
+    #Définitions nécessaires pour l'utilisation de Object3D
     tr                   = Transformation3D()
     tr.translation.y     = -np.amin(m.vertices, axis=0)[1]
     tr.translation.z     = -5
     tr.rotation_center.z = 0.2
     vitesse              = pyrr.Vector3()
-    texture        = glutils.load_texture('rouge.jpg')
+    texture              = glutils.load_texture('rouge.jpg') #la texture est obligatoire pour la classe Object3D
     o                    = ObjectPhyx(m.load_to_gpu(), m.get_nb_triangles(), program3d_id, texture, tr, vitesse)
     viewer.add_object(o)
     
 
-    #Sol (herbe)
+    #Sol (piste bleue)
     m = Mesh()
     p0, p1, p2, p3 = [-7, 0, -10], [7, 0, -10], [7, 0, 300], [-7, 0, 300]
     n, c           = [0, 1, 0], [1, 1, 1]
@@ -92,25 +91,35 @@ def main():
     o              = Object3D(m.load_to_gpu(), m.get_nb_triangles(), program3d_id, texture, Transformation3D())
     viewer.add_object(o)
 
-
-
     # m.vertices     = np.array([[p0 + n + c + t0], [p1 + n + c + t1], [p2 + n + c + t2], [p3 + n + c + t3]], np.float32)
     # m.faces        = np.array([[0, 1, 2], [0, 2, 3]], np.uint32)
     texture        = glutils.load_texture('grass.jpg')
     o              = Object3D(m.load_to_gpu(), m.get_nb_triangles(), program3d_id, texture, Transformation3D())
     viewer.add_object(o)
 
-    def create_obstacle ():
-        m                    = Mesh.load_obj('cube.obj')
-        m.normalize()
-        m.apply_matrix(pyrr.matrix44.create_from_scale([0.6, 0.6, 0.6, 0.5]))
-        tr                   = Transformation3D()
-        tr.translation.y     = -np.amin(m.vertices, axis=0)[1]
-        tr.translation.z     = -5
-        tr.rotation_center.z = 0.2
-        texture              = glutils.load_texture('jaune.jpg')
-        o                    = Object3D(m.load_to_gpu(), m.get_nb_triangles(), program3d_id, texture, tr)
-        viewer.add_object(o)
+    #Ajout d'un 1er obstacle : cube jaune
+    m                    = Mesh.load_obj('cube.obj')
+    m.normalize()
+    m.apply_matrix(pyrr.matrix44.create_from_scale([0.6, 0.6, 0.6, 0.5]))
+    tr                   = Transformation3D()
+    tr.translation.y     = -np.amin(m.vertices, axis=0)[1]
+    tr.translation.z     = -5
+    tr.rotation_center.z = 0.2
+    texture              = glutils.load_texture('jaune.jpg')
+    o                    = Object3D(m.load_to_gpu(), m.get_nb_triangles(), program3d_id, texture, tr)
+    viewer.add_object(o)
+
+    #Ajout d'un 2e obstacle : cube orange
+    m                    = Mesh.load_obj('cube.obj')
+    m.normalize()
+    m.apply_matrix(pyrr.matrix44.create_from_scale([0.6, 0.6, 0.6, 0.5]))
+    tr                   = Transformation3D()
+    tr.translation.y     = -np.amin(m.vertices, axis=0)[1]
+    tr.translation.z     = -5
+    tr.rotation_center.z = 0.2
+    texture              = glutils.load_texture('orange.png')
+    o                    = Object3D(m.load_to_gpu(), m.get_nb_triangles(), program3d_id, texture, tr)
+    viewer.add_object(o)
 
 
     vao     = Text.initalize_geometry()
