@@ -8,6 +8,7 @@ import numpy as np
 from numpy.linalg import norm
 from cpe3d import Object3D
 import time
+import random
 
 
 class ViewerGL:
@@ -37,7 +38,7 @@ class ViewerGL:
         self.touch = {}
 
     def run(self):
-        global t_espace, t_right, t_left, t_pos, score, cpt
+        global t_espace, t_right, t_left, t_pos, score, cpt, vit, i
         #initialisation de la variable t_espace pour le saut
         t_espace = 0
         t_right  = 0
@@ -45,8 +46,9 @@ class ViewerGL:
         t_pos    = 0
         score    = 0
         cpt      = 0
-        self.objs[3].transformation.translation.z = 10
-        self.objs[4].transformation.translation.z = 20
+        self.objs[3].transformation.translation.z = 20
+        self.objs[4].transformation.translation.z = 40
+        self.objs[5].transformation.translation.z = 60
         # boucle d'affichage
         while not glfw.window_should_close(self.window):
             cpt += 1
@@ -68,13 +70,15 @@ class ViewerGL:
             self.cam.transformation.translation = self.objs[0].transformation.translation + pyrr.Vector3([0, 1, 5])
             
             #On fait avancer notre personnage en continue
+            vit = 0.1 + cpt * 0.001
             self.objs[0].transformation.translation += \
-                pyrr.matrix33.apply_to_vector(pyrr.matrix33.create_from_eulers(self.objs[0].transformation.rotation_euler), pyrr.Vector3([0, 0, 0.03]))
+                pyrr.matrix33.apply_to_vector(pyrr.matrix33.create_from_eulers(self.objs[0].transformation.rotation_euler), pyrr.Vector3([0, 0, vit]))
 
-                        #Collisions
+                #Collisions
             #On récupère la hitbox de chaque objet
             hitbox_cube_jaune   = self.objs[3].transformation.translation
             hitbox_cube_orange  = self.objs[4].transformation.translation
+            hitbox_cube_vert    = self.objs[5].transformation.translation
             hitbox_spere        = self.objs[0].transformation.translation
             #On gère les collisions (affichage game over + score)
             if norm(hitbox_spere - hitbox_cube_jaune)  < 2 and cpt > 15 : #cpt permet d'initialiser le jeu (de pas perdre à 0 secondes)
@@ -89,14 +93,50 @@ class ViewerGL:
                print("Vous avez perdu !")
                print("Votre score est de : ", score)
                glfw.set_window_should_close(self.window, glfw.TRUE)
+            elif norm(hitbox_spere-hitbox_cube_vert) < 2 and cpt > 15 :
+                score = score*10
+                score = int(score)
+                print("Vous avez perdu !")
+                print("Votre score est de : ", score)
+                glfw.set_window_should_close(self.window, glfw.TRUE)
+
 
             #Déplacement des obstacles : on les déplace devant si ils sont trop loin derrière
             if self.objs[3].transformation.translation.z < self.objs[0].transformation.translation.z :
-                self.objs[3].transformation.translation.z += 20
+                self.objs[3].transformation.translation.z += 60
                 score += 1
+                i = random.randint(0,2)
+                if i == 0 :
+                    self.objs[3].transformation.translation.x = -4
+                if i == 1 :
+                    self.objs[3].transformation.translation.x = 0
+                if i == 2 :
+                    self.objs[3].transformation.translation.x = 4
             if self.objs[4].transformation.translation.z < self.objs[0].transformation.translation.z :
-                self.objs[4].transformation.translation.z += 20
+                self.objs[4].transformation.translation.z += 60
                 score += 1
+                i = random.randint(0,2)
+                if i == 0 :
+                    self.objs[4].transformation.translation.x = -4
+                if i == 1 :
+                    self.objs[4].transformation.translation.x = 0
+                if i == 2 :
+                    self.objs[4].transformation.translation.x = 4
+            if self.objs[5].transformation.translation.z < self.objs[0].transformation.translation.z :
+                self.objs[5].transformation.translation.z += 60
+                score += 1
+                i = random.randint(0,2)
+                if i == 0 :
+                    self.objs[5].transformation.translation.x = -4
+                if i == 1 :
+                    self.objs[5].transformation.translation.x = 0
+                if i == 2 :
+                    self.objs[5].transformation.translation.x = 4
+            #Affichage de victoire (si le personnage arrive au bout de la piste)
+            if self.objs[0].transformation.translation.z > 3000 :
+                print("Vous avez gagné ! Veuillez patienter pour le dévellopement du niveau 2...")
+            
+            
             
             #Pour les déplacements (il faut mettre le code ici sinon ça ne boucle pas)
 
@@ -133,7 +173,6 @@ class ViewerGL:
                 t_left = t_left -1
             else :
                 t_left = 0      
-
 
             # changement de buffer d'affichage pour éviter un effet de scintillement
             glfw.swap_buffers(self.window)

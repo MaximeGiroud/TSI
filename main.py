@@ -41,7 +41,7 @@ def main():
     m = Mesh()
     u = np.linspace(-np.pi, np.pi, nb_points)
     v = np.linspace(-np.pi/2, np.pi/2, nb_points)
-    r = 0.75
+    r = 0.65
     x = r * np.outer(np.cos(u), np.sin(v))
     y = r * np.outer(np.sin(u), np.sin(v))
     z = r * np.outer(np.ones(np.size(u)), np.cos(v))[0]
@@ -82,7 +82,7 @@ def main():
 
     #Sol (piste bleue)
     m = Mesh()
-    p0, p1, p2, p3 = [-7, 0, -10], [7, 0, -10], [7, 0, 300], [-7, 0, 300]
+    p0, p1, p2, p3 = [-7, 0, -10], [7, 0, -10], [7, 0, 2000], [-7, 0, 2000]
     n, c           = [0, 1, 0], [1, 1, 1]
     t0, t1, t2, t3 = [0, 0], [1, 0], [1, 1], [0, 1] 
     m.vertices     = np.array([[p0 + n + c + t0], [p1 + n + c + t1], [p2 + n + c + t2], [p3 + n + c + t3]], np.float32)
@@ -100,7 +100,7 @@ def main():
     #Ajout d'un 1er obstacle : cube jaune
     m                    = Mesh.load_obj('cube.obj')
     m.normalize()
-    m.apply_matrix(pyrr.matrix44.create_from_scale([0.6, 0.6, 0.6, 0.5]))
+    m.apply_matrix(pyrr.matrix44.create_from_scale([0.7, 0.7, 0.7, 0.5]))
     tr                   = Transformation3D()
     tr.translation.y     = -np.amin(m.vertices, axis=0)[1]
     tr.translation.z     = -5
@@ -112,12 +112,24 @@ def main():
     #Ajout d'un 2e obstacle : cube orange
     m                    = Mesh.load_obj('cube.obj')
     m.normalize()
-    m.apply_matrix(pyrr.matrix44.create_from_scale([0.6, 0.6, 0.6, 0.5]))
+    m.apply_matrix(pyrr.matrix44.create_from_scale([0.7, 0.7, 0.7 , 0.5]))
     tr                   = Transformation3D()
     tr.translation.y     = -np.amin(m.vertices, axis=0)[1]
     tr.translation.z     = -5
     tr.rotation_center.z = 0.2
     texture              = glutils.load_texture('orange.png')
+    o                    = Object3D(m.load_to_gpu(), m.get_nb_triangles(), program3d_id, texture, tr)
+    viewer.add_object(o)
+    
+    #Ajout d'un 3e obstacle : cube orange
+    m                    = Mesh.load_obj('cube.obj')
+    m.normalize()
+    m.apply_matrix(pyrr.matrix44.create_from_scale([0.7, 0.7, 0.7 , 0.5]))
+    tr                   = Transformation3D()
+    tr.translation.y     = -np.amin(m.vertices, axis=0)[1]
+    tr.translation.z     = -5
+    tr.rotation_center.z = 0.2
+    texture              = glutils.load_texture('vert.png')
     o                    = Object3D(m.load_to_gpu(), m.get_nb_triangles(), program3d_id, texture, tr)
     viewer.add_object(o)
 
