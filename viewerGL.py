@@ -99,8 +99,13 @@ class ViewerGL:
                 print("Vous avez perdu !")
                 print("Votre score est de : ", score)
                 glfw.set_window_should_close(self.window, glfw.TRUE)
-
-
+            
+            #Condition de victoire (fin du jeu car la piste ne continue pas plus loin)
+            if score >= 100 :
+                score = score * 10
+                print("Vous avez gagné ! vous avez attentient le score maximal :", score)
+                glfw.set_window_should_close(self.window, glfw.TRUE)
+            
             #Déplacement des obstacles : on les déplace devant si ils sont trop loin derrière
             if self.objs[3].transformation.translation.z < self.objs[0].transformation.translation.z :
                 self.objs[3].transformation.translation.z += 60
@@ -133,8 +138,7 @@ class ViewerGL:
                 if i == 2 :
                     self.objs[5].transformation.translation.x = 4
             #Affichage de victoire (si le personnage arrive au bout de la piste)
-            if self.objs[0].transformation.translation.z > 3000 :
-                print("Vous avez gagné ! Veuillez patienter pour le dévellopement du niveau 2...")
+
             
             
             
